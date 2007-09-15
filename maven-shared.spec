@@ -51,7 +51,7 @@ Patch1:         maven-shared-plugin-testing-harness-pom.patch
 
 Name:           maven-shared
 Version:        1.0
-Release:        %mkrel 4.2.1
+Release:        %mkrel 4.2.2
 Epoch:          0
 License:        Apache Software License
 Group:          Development/Java
@@ -76,8 +76,6 @@ Requires:       plexus-utils
 
 %if %{gcj_support}
 BuildRequires:          java-gcj-compat-devel
-Requires(post):         java-gcj-compat
-Requires(postun):       java-gcj-compat
 %endif
 
 %if ! %{gcj_support}
