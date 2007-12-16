@@ -51,12 +51,12 @@ Patch1:         maven-shared-plugin-testing-harness-pom.patch
 
 Name:           maven-shared
 Version:        1.0
-Release:        %mkrel 4.2.2
+Release:        %mkrel 4.2.3
 Epoch:          0
 License:        Apache Software License
 Group:          Development/Java
 
-BuildRequires:  jpackage-utils >= 0:1.7.2
+BuildRequires:  java-rpmbuild >= 0:1.7.2
 BuildRequires:  maven2 >= 0:2.0.4-9jpp
 BuildRequires:  maven2-plugin-compiler
 BuildRequires:  maven2-plugin-install
