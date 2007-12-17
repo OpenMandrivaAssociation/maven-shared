@@ -82,7 +82,6 @@ BuildRequires:          java-gcj-compat-devel
 BuildArch:      noarch
 %endif
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 Requires(post):    jpackage-utils >= 0:1.7.2
 Requires(postun):  jpackage-utils >= 0:1.7.2
