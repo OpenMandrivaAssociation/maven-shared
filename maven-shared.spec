@@ -55,6 +55,7 @@ Release:        %mkrel 4.2.3
 Epoch:          0
 License:        Apache Software License
 Group:          Development/Java
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 BuildRequires:  java-rpmbuild >= 0:1.7.2
 BuildRequires:  maven2 >= 0:2.0.4-9jpp
