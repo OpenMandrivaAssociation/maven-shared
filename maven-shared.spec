@@ -28,61 +28,115 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-%define _with_gcj_support 1
-%define gcj_support %{?_with_gcj_support:1}%{!?_with_gcj_support:%{?_without_gcj_support:0}%{!?_without_gcj_support:%{?_gcj_support:%{_gcj_support}}%{!?_gcj_support:0}}}
+%global shared_components_version 15
+%global file_management_version 1.2.2
+%global ant_version 1.0
+
+%global artifact_resolver_version 1.1
+
+%global common_artifact_filters_version 1.3
+%global dependency_analyzer_version 1.2
+%global dependency_tree_version 1.3
+%global downloader_version 1.2
+
+# missing?
+%global plugin_testing_harness_version 1.2
+
+%global filtering_version 1.0
+
+%global invoker_version 2.0.12
+%global model_converter_version 2.3
+%global osgi_version 0.3.0
+
+#this model is not included in parent pom
+%global reporting_api_version 3.0
+
+%global reporting_impl_version 2.1
+%global repository_builder_version 1.0
+
+%global runtime_version 1.0
+
+%global io_version 1.2
+%global jar_version 1.1
+%global monitor_version 1.0
+### disabled by pom.xml default
+#%global script_ant_version 2.1
+#%global script_beanshell_version 2.1
+#%global test_tools_version 1.0
+#%global toolchain_version 1.0
+%global verifier_version 1.3
 
 Summary:        Maven Shared Components
 URL:            http://maven.apache.org/shared/
-
-# svn export
-#    http://svn.apache.org/repos/asf/maven/shared/tags/file-management-1.0/
-# tar czf maven-shared-file-management-1.0.tar.gz file-management-1.0/
-Source0:        maven-shared-file-management-1.0.tar.gz
-Source1:        %{name}-mapdeps.xsl
-Source2:        %{name}-addjunitdep.xml
-Source3:        %{name}-pom.xml
-# svn export 
-#    http://svn.apache.org/repos/asf/maven/shared/tags/maven-plugin-testing-harness-1.0-beta-1/
-# tar czf maven-plugin-testing-harness-1.0-beta-1.tar.gz 
-#    maven-plugin-testing-harness-1.0-beta-1/
-Source4:        maven-plugin-testing-harness-1.0-beta-1.tar.gz
-
-Patch1:         maven-shared-plugin-testing-harness-pom.patch
-
 Name:           maven-shared
-Version:        1.0
-Release:        %mkrel 4.2.3
-Epoch:          0
-License:        Apache Software License
+Version:        15
+Release:        16
+License:        ASL 2.0
 Group:          Development/Java
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
-BuildRequires:  java-rpmbuild >= 0:1.7.2
-BuildRequires:  maven2 >= 0:2.0.4-9jpp
-BuildRequires:  maven2-plugin-compiler
-BuildRequires:  maven2-plugin-install
-BuildRequires:  maven2-plugin-jar
-BuildRequires:  maven2-plugin-javadoc
-BuildRequires:  maven2-plugin-release
-BuildRequires:  maven2-plugin-resources
-BuildRequires:  maven2-plugin-surefire
+# svn export \
+# http://svn.apache.org/repos/asf/maven/shared/tags/maven-shared-components-15/
+# tar czf maven-shared-components-14.tar.gz maven-shared-components-15
+Source0:        maven-shared-components-%{version}.tar.gz
+Source1:        %{name}-jpp-depmap.xml
+
+Patch0:        %{name}-pom.patch
+Patch1:        maven-ant-pom_xml.patch
+Patch2:        maven-dependency-tree-pom.patch
+Patch3:        maven-osgi-pom.patch
+Patch4:        maven-repository-build-pom.patch
+Patch5:        maven-runtime-pom.patch
+Patch6:        maven-runtime-XMLMavenRuntimeVisitor.patch
+Patch7:        maven-artifact-resolver-pom.patch
+
+BuildRequires:  jpackage-utils >= 0:1.7.2
+BuildRequires:  ant
+BuildRequires:  maven
+BuildRequires:  maven-compiler-plugin
+BuildRequires:  maven-install-plugin
+BuildRequires:  maven-jar-plugin
+BuildRequires:  maven-javadoc-plugin
+BuildRequires:  maven-resources-plugin
+BuildRequires:  maven-source-plugin
+BuildRequires:  maven-surefire-plugin
+BuildRequires:  maven-surefire-report-plugin
+BuildRequires:  maven-site-plugin
+BuildRequires:  maven-javadoc-plugin
+BuildRequires:  maven-doxia
+BuildRequires:  maven-doxia-sitetools
+BuildRequires:  maven-doxia-tools
+BuildRequires:  maven-shared-reporting-impl
+BuildRequires:  maven-plugin-testing-tools
+BuildRequires:  maven-test-tools
+BuildRequires:  plexus-maven-plugin
+BuildRequires:  plexus-component-api
+BuildRequires:  maven-plugin-cobertura
 BuildRequires:  junit
 BuildRequires:  saxon
 BuildRequires:  saxon-scripts
 BuildRequires:  plexus-utils
-BuildRequires:  modello-maven-plugin
+BuildRequires:  plexus-digest
+BuildRequires:  modello
+BuildRequires:  easymock2
+BuildRequires:  objectweb-asm
+BuildRequires:  dom4j
+BuildRequires: aqute-bndlib
+BuildRequires:  maven-wagon
 
+Requires:       ant
+Requires:       ant-nodeps
 Requires:       maven2 >= 0:2.0.4
 Requires:       plexus-utils
+Requires:       saxon
+Requires:       saxon-scripts
+Requires:       plexus-utils
+Requires:       plexus-digest
+Requires:       objectweb-asm
+Requires:       dom4j
+Requires:       aqute-bndlib
+Requires:       maven-wagon
 
-%if %{gcj_support}
-BuildRequires:          java-gcj-compat-devel
-%endif
-
-%if ! %{gcj_support}
 BuildArch:      noarch
-%endif
-
 
 Requires(post):    jpackage-utils >= 0:1.7.2
 Requires(postun):  jpackage-utils >= 0:1.7.2
@@ -93,138 +147,384 @@ Maven Shared Components
 %package file-management
 Summary:        Maven Shared File Management API
 Group:          Development/Java
-Requires:       %{name} = %{epoch}:%{version}-%{release}
-Requires:       plexus-utils
-Requires:       junit
+Version:        %{file_management_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  %{name}-io >= 0:%{io_version}
+Requires:  maven2
+Requires:  plexus-container-default
+Requires:  plexus-utils
 
 %description file-management
-%{summary}.
+API to collect files from a given directory using
+several include/exclude rules.
 
-%package file-management-javadoc
-Summary:        Javadoc for %{name}-file-management
+%package osgi
+Summary:        Maven OSGi
 Group:          Development/Java
+Version:        %{osgi_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  aqute-bndlib
+Requires:  maven
 
-%description file-management-javadoc
-%{summary}.
+%description osgi
+Library for Maven-OSGi integration
 
-%package plugin-testing-harness
-Summary:        Maven Shared Plugin Testing Harness
+%package ant
+Summary:        Maven Ant
 Group:          Development/Java
-Requires:       %{name} = %{epoch}:%{version}-%{release}
+Version:        %{ant_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  ant
+Requires:  maven
+Requires:  plexus-containers-container-default
 
-%description plugin-testing-harness
-%{summary}.
+%description ant
+Runs ant scripts embedded in the POM.
 
-%package plugin-testing-harness-javadoc
-Summary:        Javadoc for %{name}-plugin-testing-harness
+%package common-artifact-filters
+Summary:        Maven Common Artifact Filters
 Group:          Development/Java
+Version:        %{common_artifact_filters_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  %{name}-test-tools >= 0:%{test_tools_version}-%{release}
+Requires:  junit
+Requires:  maven
+Requires:  plexus-container-default
 
-%description plugin-testing-harness-javadoc
+%description common-artifact-filters
 %{summary}.
+
+%package dependency-tree
+Summary:        Maven Dependency Tree
+Group:          Development/Java
+Version:        %{dependency_tree_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  %{name}-plugin-testing-harness >= 0:%{plugin_testing_harness_version}-%{release}
+Requires:  maven
+
+%description dependency-tree
+%{summary}.
+
+%package downloader
+Summary:        Maven Downloader
+Group:          Development/Java
+Version:        %{downloader_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  maven
+
+%description downloader
+Provide a super simple interface for downloading a
+single artifact.
+
+%package dependency-analyzer
+Summary:        Maven Dependency Analyzer
+Group:          Development/Java
+Version:        %{dependency_analyzer_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  maven
+Requires:  objectweb-asm
+
+%description dependency-analyzer
+%{summary}.
+
+%package invoker
+Summary:        Maven Process Invoker
+Group:          Development/Java
+Version:        %{invoker_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  %{name}-monitor >= 0:%{monitor_version}-%{release}
+Requires:  maven
+Requires:  plexus-utils
+
+%description invoker
+%{summary}.
+
+%package model-converter
+Summary:        Maven Model Converter
+Group:          Development/Java
+Version:        %{model_converter_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  dom4j
+Requires:  maven
+Requires:  plexus-container-default
+Requires:  plexus-utils
+
+%description model-converter
+Converts between version 3.0.0 and version 4.0.0 models.
+
+%package reporting-impl
+Summary:        Maven Reporting Implementation
+Group:          Development/Java
+Version:        %{reporting_impl_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  jakarta-commons-validator
+Requires:  jakarta-oro
+Requires:  maven
+Requires:  maven-doxia
+
+%description reporting-impl
+%{summary}.
+
+%package repository-builder
+Summary:        Maven Repository Builder
+Group:          Development/Java
+Version:        %{repository_builder_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  %{name}-common-artifact-filters = 0:%{common_artifact_filters_version}-%{release}
+Requires:  maven
+
+%description repository-builder
+%{summary}.
+
+%package io
+Summary:        Maven Shared I/O API
+Group:          Development/Java
+Version:        %{io_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  maven
+Requires:  maven-wagon
+Requires:  plexus-utils
+Requires:  plexus-container-default
+
+%description io
+%{summary}.
+
+%package jar
+Summary:        Maven Shared Jar
+Group:          Development/Java
+Version:        %{jar_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  maven
+
+%description jar
+Utilities that help identify the contents of a JAR,
+including Java class analysis and Maven metadata
+analysis.
+
+%package monitor
+Summary:        Maven Shared Monitor API
+Group:          Development/Java
+Version:        %{monitor_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  maven
+Requires:  plexus-container-default
+
+%description monitor
+%{summary}.
+
+%package verifier
+Summary:        Maven Verifier Component
+Group:          Development/Java
+Version:        %{verifier_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  junit
+
+%description verifier
+%{summary}.
+
+%package javadoc
+Summary:        Javadoc for %{name}
+Group:          Development/Java 
+Provides:       %{name}-file-management-javadoc = %{file_management_version}-%{release}
+Obsoletes:      %{name}-file-management-javadoc < %{file_management_version}-%{release}
+Provides:       %{name}-plugin-testing-harness-javadoc = %{plugin_testing_harness_version}-%{release}
+Obsoletes:      %{name}-plugin-testing-harness-javadoc < %{plugin_testing_harness_version}-%{release}
+
+%description javadoc
+%{summary}.
+
+%package artifact-resolver
+Summary:        Maven Artifact Resolution API
+Group:          Development/Java
+Version:        %{artifact_resolver_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  ant
+Requires:  maven
+
+%description artifact-resolver
+Provides a component for plugins to easily resolve project dependencies.
+
+%package filtering
+Summary:        Maven Filtering
+Group:          Development/Java
+Version:        %{filtering_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  ant
+Requires:  maven
+
+%description filtering
+A component to assist in filtering of resource files with properties from a Maven project.
+
+%package reporting-api
+Summary:        Maven Reporting API
+Group:          Development/Java
+Version:        %{reporting_api_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  ant
+Requires:  maven
+
+%description reporting-api
+Maven Reporting API.
+
+%package runtime
+Summary:        Maven Runtime
+Group:          Development/Java
+Version:        %{runtime_version}
+Requires:  %{name} = 0:%{shared_components_version}-%{release}
+Requires:  ant
+Requires:  maven
+
+%description runtime
+Maven Runtime allows introspection of Maven project metadata at runtime.  Basic artifact information or full Maven
+project metadata can be obtained for all projects within a given class loader, optionally sorted into dependency
+order, and also for a given class within a project.
 
 %prep
-%setup -q -c -n %{name}-%{version}
-gzip -dc %{SOURCE4} | tar xf -
+%setup -q -n %{name}-components-%{shared_components_version}
 chmod -R go=u-w *
-%patch1 -b .sav
+%patch0 -p0 -b .sav0
+%patch1 -p0 -b .sav1
+%patch2 -p0 -b .sav2
+%patch3 -p0 -b .sav3
+%patch4 -p0 -b .sav4
+%patch5 -p0 -b .sav5
+%patch6 -p0 -b .sav6
+%patch7 -p0 -b .sav7
 
-mkdir external_repo
-ln -s %{_javadir} external_repo/JPP
+# need namespace for new version modello
+sed -i "s|<model>|<model xmlns=\"http://modello.codehaus.org/MODELLO/1.3.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://modello.codehaus.org/MODELLO/1.3.0 http://modello.codehaus.org/xsd/modello-1.3.0.xsd\" xml.namespace=\"..\" xml.schemaLocation=\"..\" xsd.namespace=\"..\" xsd.targetNamespace=\"..\">|" file-management/src/main/mdo/fileset.mdo
+sed -i "s|<groupId>ant|<groupId>org.apache.ant|g" maven-ant/pom.xml
+
+# Remove test that needs junit-addons until that makes it into Fedora
+rm -f maven-reporting-impl/src/test/java/org/apache/maven/reporting/AbstractMavenReportRendererTest.java
+
+# Remove tests that need jmock (for now)
+rm -f maven-dependency-analyzer/src/test/java/org/apache/maven/shared/dependency/analyzer/InputStreamConstraint.java
+rm -f maven-dependency-analyzer/src/test/java/org/apache/maven/shared/dependency/analyzer/ClassFileVisitorUtilsTest.java
+rm -f maven-dependency-analyzer/src/test/java/org/apache/maven/shared/dependency/analyzer/AbstractFileTest.java
 
 %build
-[ -z "$JAVA_HOME" ] && JAVA_HOME=%{_jvmdir}/java
-export JAVA_HOME
-
-cp -p file-management-1.0/pom.xml{,.withoutjunit}
-saxon -o file-management-1.0/pom.xml file-management-1.0/pom.xml.withoutjunit \
-  /usr/share/java-utils/xml/maven2jpp-mapdeps.xsl map=%{SOURCE2}
-
-cp -p %{SOURCE3} pom.xml
-
-export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
-mkdir -p $MAVEN_REPO_LOCAL
-
-mvn-jpp \
-        -e \
-        -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+mvn-rpmbuild \
+        -Dmaven.local.depmap.file=%{SOURCE1} \
+        -Dmaven.test.skip=true \
         -Dmaven.test.failure.ignore=true \
-        install javadoc:javadoc
+        install javadoc:aggregate
 
 %install
-rm -rf $RPM_BUILD_ROOT
 
+rm -rf $RPM_BUILD_ROOT
 # main package infrastructure
 install -d -m 755 $RPM_BUILD_ROOT%{_javadir}/maven-shared
-install -d -m 755 $RPM_BUILD_ROOT/%{_datadir}/maven2/poms
+install -d -m 755 $RPM_BUILD_ROOT/%{_mavenpomdir}
 
-# poms
-install -pm 644 pom.xml \
-  $RPM_BUILD_ROOT/%{_datadir}/maven2/poms/JPP.maven-shared-components-parent.pom
-%add_to_maven_depmap org.apache.maven.shared shared-components-parent 1 JPP/maven-shared components-parent
+# poms and jars
+install -pm 644 pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-components-parent.pom
+%add_to_maven_depmap org.apache.maven.shared maven-shared-components %{shared_components_version} JPP/maven-shared components-parent
 
-install -pm 644 file-management-%{version}/pom.xml \
-  $RPM_BUILD_ROOT/%{_datadir}/maven2/poms/JPP.maven-shared-file-management.pom
-%add_to_maven_depmap org.apache.maven.shared file-management 1.0 JPP/maven-shared file-management
+install -pm 644 maven-downloader/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-downloader.pom
+%add_to_maven_depmap org.apache.maven.shared maven-downloader %{downloader_version} JPP/maven-shared downloader
+install -p -m 0644 maven-downloader/target/maven-downloader-%{downloader_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/downloader.jar
 
-install -pm 644 maven-plugin-testing-harness-1.0-beta-1/pom.xml \
-  $RPM_BUILD_ROOT/%{_datadir}/maven2/poms/JPP.maven-shared-plugin-testing-harness.pom
-%add_to_maven_depmap org.apache.maven.shared maven-plugin-testing-harness 1.0-beta-1 JPP/maven-shared plugin-testing-harness
+install -pm 644 maven-dependency-analyzer/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-dependency-analyzer.pom
+%add_to_maven_depmap org.apache.maven.shared maven-dependency-analyzer %{dependency_analyzer_version} JPP/maven-shared dependency-analyzer
+install -p -m 0644 maven-dependency-analyzer/target/maven-dependency-analyzer-%{dependency_analyzer_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/dependency-analyzer.jar
 
-# subpackage jars
-install -p -m 0644 \
-      file-management-%{version}/target/file-management-%{version}.jar \
-      $RPM_BUILD_ROOT%{_javadir}/maven-shared
-pushd $RPM_BUILD_ROOT%{_javadir}/maven-shared
-  ln -sf file-management-%{version}.jar file-management.jar
-popd
+install -pm 644 maven-dependency-tree/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-dependency-tree.pom
+%add_to_maven_depmap org.apache.maven.shared maven-dependency-tree %{dependency_tree_version} JPP/maven-shared dependency-tree
+install -p -m 0644 maven-dependency-tree/target/maven-dependency-tree-%{dependency_tree_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/dependency-tree.jar
 
-install -p -m 0644 \
-      maven-plugin-testing-harness-1.0-beta-1/target/maven-plugin-testing-harness-1.0-beta-1.jar \
-      $RPM_BUILD_ROOT%{_javadir}/maven-shared/plugin-testing-harness-%{version}.jar
-pushd $RPM_BUILD_ROOT%{_javadir}/maven-shared
-  ln -sf plugin-testing-harness-%{version}.jar plugin-testing-harness.jar
-popd
+install -pm 644 maven-verifier/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-verifier.pom
+%add_to_maven_depmap org.apache.maven.shared maven-verifier %{verifier_version} JPP/maven-shared verifier
+install -p -m 0644 maven-verifier/target/maven-verifier-%{verifier_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/verifier.jar
+
+install -pm 644 maven-shared-monitor/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-monitor.pom
+%add_to_maven_depmap org.apache.maven.shared maven-shared-monitor %{monitor_version} JPP/maven-shared monitor
+install -p -m 0644 maven-shared-monitor/target/maven-shared-monitor-%{monitor_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/monitor.jar
+
+install -pm 644 maven-shared-io/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-io.pom
+%add_to_maven_depmap org.apache.maven.shared maven-shared-io %{io_version} JPP/maven-shared io
+install -p -m 0644 maven-shared-io/target/maven-shared-io-%{io_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/io.jar
+
+install -pm 644 maven-shared-jar/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-jar.pom
+%add_to_maven_depmap org.apache.maven.shared maven-shared-jar %{jar_version} JPP/maven-shared jar
+install -p -m 0644 maven-shared-jar/target/maven-shared-jar-%{jar_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/jar.jar
+
+install -pm 644 maven-repository-builder/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-repository-builder.pom
+%add_to_maven_depmap org.apache.maven.shared maven-repository-builder %{repository_builder_version} JPP/maven-shared repository-builder
+install -p -m 0644 maven-repository-builder/target/maven-repository-builder-%{repository_builder_version}-alpha-3-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/repository-builder.jar
+
+install -pm 644 maven-reporting-impl/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-reporting-impl.pom
+%add_to_maven_depmap org.apache.maven.reporting maven-reporting-impl %{reporting_impl_version} JPP/maven-shared reporting-impl
+install -p -m 0644 maven-reporting-impl/target/maven-reporting-impl-%{reporting_impl_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/reporting-impl.jar
+
+install -pm 644 maven-model-converter/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-model-converter.pom
+%add_to_maven_depmap org.apache.maven.shared maven-model-converter %{model_converter_version} JPP/maven-shared model-converter
+install -p -m 0644 maven-model-converter/target/maven-model-converter-%{model_converter_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/model-converter.jar
+
+install -pm 644 maven-invoker/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-invoker.pom
+%add_to_maven_depmap org.apache.maven.shared maven-invoker %{invoker_version} JPP/maven-shared invoker
+install -p -m 0644 maven-invoker/target/maven-invoker-%{invoker_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/invoker.jar
+
+install -pm 644 maven-common-artifact-filters/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-common-artifact-filters.pom
+%add_to_maven_depmap org.apache.maven.shared maven-common-artifact-filters %{common_artifact_filters_version} JPP/maven-shared common-artifact-filters
+install -p -m 0644 maven-common-artifact-filters/target/maven-common-artifact-filters-%{common_artifact_filters_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/common-artifact-filters.jar
+
+install -pm 644 maven-ant/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-ant.pom
+%add_to_maven_depmap org.apache.maven.shared maven-ant %{ant_version} JPP/maven-shared ant
+install -p -m 0644 maven-ant/target/maven-ant-%{ant_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/ant.jar
+
+install -pm 644 maven-osgi/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-osgi.pom
+%add_to_maven_depmap org.apache.maven.shared maven-osgi %{osgi_version} JPP/maven-shared osgi
+install -p -m 0644 maven-osgi/target/maven-osgi-%{osgi_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/osgi.jar
+
+install -pm 644 file-management/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-file-management.pom
+%add_to_maven_depmap org.apache.maven.shared file-management %{file_management_version} JPP/maven-shared file-management
+install -p -m 0644 file-management/target/file-management-%{file_management_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/file-management.jar
+
+install -pm 644 maven-artifact-resolver/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-artifact-resolver.pom
+%add_to_maven_depmap org.apache.maven.shared maven-artifact-resolver %{artifact_resolver_version} JPP/maven-shared artifact-resolver
+install -p -m 0644 maven-artifact-resolver/target/maven-artifact-resolver-%{artifact_resolver_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/artifact-resolver.jar
+
+install -pm 644 maven-filtering/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-filtering.pom
+%add_to_maven_depmap org.apache.maven.shared maven-filtering %{filtering_version} JPP/maven-shared filtering
+install -p -m 0644 maven-filtering/target/maven-filtering-%{filtering_version}-beta-4-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/filtering.jar
+
+install -pm 644 maven-reporting-api/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-reporting-api.pom
+%add_to_maven_depmap org.apache.maven.shared maven-reporting-api %{reporting_api_version} JPP/maven-shared reporting-api
+install -p -m 0644 maven-reporting-api/target/maven-reporting-api-%{reporting_api_version}-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/reporting-api.jar
+
+install -pm 644 maven-runtime/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-runtime.pom
+%add_to_maven_depmap org.apache.maven.shared maven-runtime %{runtime_version} JPP/maven-shared runtime
+install -p -m 0644 maven-runtime/target/maven-runtime-%{runtime_version}-alpha-3-SNAPSHOT.jar \
+        $RPM_BUILD_ROOT%{_javadir}/maven-shared/runtime.jar
 
 # javadoc
-install -d -m 755 \
-      $RPM_BUILD_ROOT%{_javadocdir}/%{name}-file-management-%{version}
-cp -pr file-management-%{version}/target/site/apidocs/* \
-      $RPM_BUILD_ROOT%{_javadocdir}/%{name}-file-management-%{version}
-ln -s %{name}-file-management-%{version} \
-      $RPM_BUILD_ROOT%{_javadocdir}/%{name}-file-management
-install -d -m 755 \
-      $RPM_BUILD_ROOT%{_javadocdir}/%{name}-plugin-testing-harness-%{version}
-cp -pr maven-plugin-testing-harness-1.0-beta-1/target/site/apidocs/* \
-      $RPM_BUILD_ROOT%{_javadocdir}/%{name}-plugin-testing-harness-%{version}
-ln -s %{name}-plugin-testing-harness-%{version} \
-      $RPM_BUILD_ROOT%{_javadocdir}/%{name}-plugin-testing-harness
+install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{shared_components_version}
+cp -pr target/site/apidocs/* \
+         $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{shared_components_version}/
 
-%if %{gcj_support}
-%{_bindir}/aot-compile-rpm
-%endif
+ln -s %{name}-%{shared_components_version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
-%if %{gcj_support}
-%post file-management
-%{update_gcjdb}
-%endif
-
-%if %{gcj_support}
-%postun file-management
-%{clean_gcjdb}
-%endif
-
-%if %{gcj_support}
-%post plugin-testing-harness
-%{update_gcjdb}
-%endif
-
-%if %{gcj_support}
-%postun plugin-testing-harness
-%{clean_gcjdb}
-%endif
 
 %post
 %update_maven_depmap
@@ -235,33 +535,108 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %dir %{_javadir}/maven-shared
-%dir %{_datadir}/maven2/poms
-%{_datadir}/maven2/poms/JPP.maven-shared-components-parent.pom
+%dir %{_mavenpomdir}
+%{_mavenpomdir}/JPP.maven-shared-components-parent.pom
 %{_mavendepmapfragdir}
-%config(noreplace) /etc/maven/fragments/maven-shared
 
 %files file-management
 %defattr(-,root,root,-)
 %{_javadir}/maven-shared/file-management*.jar
-%{_datadir}/maven2/poms/JPP.maven-shared-file-management.pom
-%if %{gcj_support}
-%attr(-,root,root) %dir %{_libdir}/gcj/%{name}
-%attr(-,root,root) %{_libdir}/gcj/%{name}/file-management*-%{version}.jar.*
-%endif
+%{_mavenpomdir}/JPP.maven-shared-file-management.pom
 
-%files plugin-testing-harness
+%files osgi
 %defattr(-,root,root,-)
-%{_javadir}/maven-shared/plugin-testing-harness*.jar
-%{_datadir}/maven2/poms/JPP.maven-shared-plugin-testing-harness.pom
-%if %{gcj_support}
-%attr(-,root,root) %dir %{_libdir}/gcj/%{name}
-%attr(-,root,root) %{_libdir}/gcj/%{name}/plugin-testing-harness*-%{version}.jar.*
-%endif
+%{_javadir}/maven-shared/osgi*.jar
+%{_mavenpomdir}/JPP.maven-shared-osgi.pom
 
-%files file-management-javadoc
-%defattr(0644,root,root,0755)
-%doc %{_javadocdir}/%{name}-file-management*
+%files ant
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/ant*.jar
+%{_mavenpomdir}/JPP.maven-shared-ant.pom
 
-%files plugin-testing-harness-javadoc
-%defattr(0644,root,root,0755)
-%doc %{_javadocdir}/%{name}-plugin-testing-harness*
+%files common-artifact-filters
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/common-artifact-filters*.jar
+%{_mavenpomdir}/JPP.maven-shared-common-artifact-filters.pom
+
+%files dependency-analyzer
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/dependency-analyzer*.jar
+%{_mavenpomdir}/JPP.maven-shared-dependency-analyzer.pom
+
+%files dependency-tree
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/dependency-tree*.jar
+%{_mavenpomdir}/JPP.maven-shared-dependency-tree.pom
+
+%files downloader
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/downloader*.jar
+%{_mavenpomdir}/JPP.maven-shared-downloader.pom
+
+%files invoker
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/invoker*.jar
+%{_mavenpomdir}/JPP.maven-shared-invoker.pom
+
+%files model-converter
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/model-converter*.jar
+%{_mavenpomdir}/JPP.maven-shared-model-converter.pom
+
+
+%files reporting-impl
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/reporting-impl*.jar
+%{_mavenpomdir}/JPP.maven-shared-reporting-impl.pom
+
+%files repository-builder
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/repository-builder*.jar
+%{_mavenpomdir}/JPP.maven-shared-repository-builder.pom
+
+%files io
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/io*.jar
+%{_mavenpomdir}/JPP.maven-shared-io.pom
+
+%files jar
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/jar*.jar
+%{_mavenpomdir}/JPP.maven-shared-jar.pom
+
+%files monitor
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/monitor*.jar
+%{_mavenpomdir}/JPP.maven-shared-monitor.pom
+
+%files verifier
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/verifier*.jar
+%{_mavenpomdir}/JPP.maven-shared-verifier.pom
+
+%files artifact-resolver
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/artifact-resolver*.jar
+%{_mavenpomdir}/JPP.maven-shared-artifact-resolver.pom
+
+%files filtering
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/filtering*.jar
+%{_mavenpomdir}/JPP.maven-shared-filtering.pom
+
+%files reporting-api
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/reporting-api*.jar
+%{_mavenpomdir}/JPP.maven-shared-reporting-api.pom
+
+%files runtime
+%defattr(-,root,root,-)
+%{_javadir}/maven-shared/runtime*.jar
+%{_mavenpomdir}/JPP.maven-shared-runtime.pom
+
+%files javadoc
+%defattr(-,root,root,-)
+%{_javadocdir}/%{name}-%{shared_components_version}
+%doc %{_javadocdir}/%{name}
+
