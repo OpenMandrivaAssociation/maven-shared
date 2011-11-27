@@ -70,7 +70,7 @@ Summary:        Maven Shared Components
 URL:            http://maven.apache.org/shared/
 Name:           maven-shared
 Version:        15
-Release:        16
+Release:        18
 License:        ASL 2.0
 Group:          Development/Java
 
