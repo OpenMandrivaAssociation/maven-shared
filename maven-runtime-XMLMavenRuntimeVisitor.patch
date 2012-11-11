@@ -1,0 +1,13 @@
+--- maven-runtime/src/main/java/org/apache/maven/shared/runtime/XMLMavenRuntimeVisitor.java.orig	2009-11-02 23:05:33.000000000 +0800
++++ maven-runtime/src/main/java/org/apache/maven/shared/runtime/XMLMavenRuntimeVisitor.java	2010-09-14 17:15:47.622372781 +0800
+@@ -117,6 +117,10 @@
+         {
+             throw new MavenRuntimeException( "Cannot sort projects", exception );
+         }
++	catch (Exception exception )
++        {
++            throw new MavenRuntimeException( "Cannot sort projects", exception );
++        }
+     }
+ 
+     // private methods --------------------------------------------------------

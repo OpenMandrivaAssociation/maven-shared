@@ -1,0 +1,19 @@
+--- maven-runtime/pom.xml.orig	2010-09-14 16:51:30.925824317 +0800
++++ maven-runtime/pom.xml	2010-09-14 17:04:03.603399933 +0800
+@@ -49,6 +49,16 @@
+   <dependencies>
+     <dependency>
+       <groupId>org.apache.maven</groupId>
++      <artifactId>maven-model</artifactId>
++      <version>2.0.8</version>
++    </dependency>
++    <dependency>
++      <groupId>org.codehaus.plexus</groupId>
++      <artifactId>plexus-utils</artifactId>
++      <version>1.5.6</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
+       <artifactId>maven-project</artifactId>
+       <version>2.0.8</version>
+     </dependency>

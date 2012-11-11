@@ -1,0 +1,14 @@
+--- maven-osgi/pom.xml.orig	2010-09-13 17:32:07.453727331 +0800
++++ maven-osgi/pom.xml	2010-09-13 17:33:33.392662627 +0800
+@@ -35,6 +35,11 @@
+   <dependencies>
+     <dependency>
+       <groupId>org.apache.maven</groupId>
++      <artifactId>maven-artifact</artifactId>
++      <version>2.0.9</version>
++    </dependency>
++    <dependency>
++      <groupId>org.apache.maven</groupId>
+       <artifactId>maven-project</artifactId>
+       <version>2.0.6</version>
+     </dependency>
