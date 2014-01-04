@@ -1,3 +1,4 @@
+%{?_javapackages_macros:%_javapackages_macros}
 # Copyright (c) 2000-2005, JPackage Project
 # All rights reserved.
 #
@@ -28,615 +29,218 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-%global shared_components_version 15
-%global file_management_version 1.2.2
-%global ant_version 1.0
-
-%global artifact_resolver_version 1.1
-
-%global common_artifact_filters_version 1.3
-%global dependency_analyzer_version 1.2
-%global dependency_tree_version 1.3
-%global downloader_version 1.2
-
-# missing?
-%global plugin_testing_harness_version 1.2
-
-%global filtering_version 1.0
-
-%global invoker_version 2.0.12
-%global model_converter_version 2.3
-%global osgi_version 0.3.0
-
-#this model is not included in parent pom
-%global reporting_api_version 3.0
-
-%global reporting_impl_version 2.1
-%global repository_builder_version 1.0
-
-%global runtime_version 1.0
-
-%global io_version 1.2
-%global jar_version 1.1
-%global monitor_version 1.0
-### disabled by pom.xml default
-#%global script_ant_version 2.1
-#%global script_beanshell_version 2.1
-#%global test_tools_version 1.0
-#%global toolchain_version 1.0
-%global verifier_version 1.3
-
 Summary:        Maven Shared Components
 URL:            http://maven.apache.org/shared/
 Name:           maven-shared
-Version:        15
-Release:        18
+Version:        19
+Release:        4.0%{?dist}
 License:        ASL 2.0
-Group:          Development/Java
 
-# svn export \
-# http://svn.apache.org/repos/asf/maven/shared/tags/maven-shared-components-15/
-# tar czf maven-shared-components-14.tar.gz maven-shared-components-15
-Source0:        maven-shared-components-%{version}.tar.gz
-Source1:        %{name}-jpp-depmap.xml
 
-Patch0:        %{name}-pom.patch
-Patch1:        maven-ant-pom_xml.patch
-Patch2:        maven-dependency-tree-pom.patch
-Patch3:        maven-osgi-pom.patch
-Patch4:        maven-repository-build-pom.patch
-Patch5:        maven-runtime-pom.patch
-Patch6:        maven-runtime-XMLMavenRuntimeVisitor.patch
-Patch7:        maven-artifact-resolver-pom.patch
+Source0:        https://github.com/apache/%{name}/archive/%{name}-components-%{version}.tar.gz
 
-BuildRequires:  jpackage-utils >= 0:1.7.2
-BuildRequires:  ant
-BuildRequires:  maven
-BuildRequires:  maven-compiler-plugin
-BuildRequires:  maven-install-plugin
-BuildRequires:  maven-jar-plugin
-BuildRequires:  maven-javadoc-plugin
-BuildRequires:  maven-resources-plugin
-BuildRequires:  maven-source-plugin
-BuildRequires:  maven-surefire-plugin
-BuildRequires:  maven-surefire-report-plugin
-BuildRequires:  maven-site-plugin
-BuildRequires:  maven-javadoc-plugin
-BuildRequires:  maven-doxia
-BuildRequires:  maven-doxia-sitetools
-BuildRequires:  maven-doxia-tools
-BuildRequires:  maven-shared-reporting-impl
-BuildRequires:  maven-plugin-testing-tools
-BuildRequires:  maven-test-tools
-BuildRequires:  plexus-maven-plugin
-BuildRequires:  plexus-component-api
-BuildRequires:  maven-plugin-cobertura
-BuildRequires:  junit
-BuildRequires:  saxon
-BuildRequires:  saxon-scripts
-BuildRequires:  plexus-utils
-BuildRequires:  plexus-digest
-BuildRequires:  modello
-BuildRequires:  easymock2
-BuildRequires:  objectweb-asm
-BuildRequires:  dom4j
-BuildRequires: aqute-bndlib
-BuildRequires:  maven-wagon
-
-Requires:       ant
-Requires:       ant-nodeps
-Requires:       maven2 >= 0:2.0.4
-Requires:       plexus-utils
-Requires:       saxon
-Requires:       saxon-scripts
-Requires:       plexus-utils
-Requires:       plexus-digest
-Requires:       objectweb-asm
-Requires:       dom4j
-Requires:       aqute-bndlib
-Requires:       maven-wagon
+BuildRequires:  java-devel
+BuildRequires:  maven-local
 
 BuildArch:      noarch
 
-Requires(post):    jpackage-utils >= 0:1.7.2
-Requires(postun):  jpackage-utils >= 0:1.7.2
+# Obsoleting retired subpackages. The packages with hardcoded versions and
+# releases had their versions manually set in maven-shared-15 to something else
+# than {version}. To make the change effective, the release below is one
+# greater than the last release of maven-shared-15 in rawhide.
+Obsoletes:      maven-shared-ant < 1.0-32
+Obsoletes:      maven-shared-model-converter < 2.3-32
+Obsoletes:      maven-shared-runtime < 1.0-32
+Obsoletes:      maven-shared-monitor < 1.0-32
+Obsoletes:      maven-shared-javadoc < %{version}-%{release}
 
 %description
 Maven Shared Components
 
-%package file-management
-Summary:        Maven Shared File Management API
-Group:          Development/Java
-Version:        %{file_management_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  %{name}-io >= 0:%{io_version}
-Requires:  maven2
-Requires:  plexus-container-default
-Requires:  plexus-utils
-
-%description file-management
-API to collect files from a given directory using
-several include/exclude rules.
-
-%package osgi
-Summary:        Maven OSGi
-Group:          Development/Java
-Version:        %{osgi_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  aqute-bndlib
-Requires:  maven
-
-%description osgi
-Library for Maven-OSGi integration
-
-%package ant
-Summary:        Maven Ant
-Group:          Development/Java
-Version:        %{ant_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  ant
-Requires:  maven
-Requires:  plexus-containers-container-default
-
-%description ant
-Runs ant scripts embedded in the POM.
-
-%package common-artifact-filters
-Summary:        Maven Common Artifact Filters
-Group:          Development/Java
-Version:        %{common_artifact_filters_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  %{name}-test-tools >= 0:%{test_tools_version}-%{release}
-Requires:  junit
-Requires:  maven
-Requires:  plexus-container-default
-
-%description common-artifact-filters
-%{summary}.
-
-%package dependency-tree
-Summary:        Maven Dependency Tree
-Group:          Development/Java
-Version:        %{dependency_tree_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  %{name}-plugin-testing-harness >= 0:%{plugin_testing_harness_version}-%{release}
-Requires:  maven
-
-%description dependency-tree
-%{summary}.
-
-%package downloader
-Summary:        Maven Downloader
-Group:          Development/Java
-Version:        %{downloader_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  maven
-
-%description downloader
-Provide a super simple interface for downloading a
-single artifact.
-
-%package dependency-analyzer
-Summary:        Maven Dependency Analyzer
-Group:          Development/Java
-Version:        %{dependency_analyzer_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  maven
-Requires:  objectweb-asm
-
-%description dependency-analyzer
-%{summary}.
-
-%package invoker
-Summary:        Maven Process Invoker
-Group:          Development/Java
-Version:        %{invoker_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  %{name}-monitor >= 0:%{monitor_version}-%{release}
-Requires:  maven
-Requires:  plexus-utils
-
-%description invoker
-%{summary}.
-
-%package model-converter
-Summary:        Maven Model Converter
-Group:          Development/Java
-Version:        %{model_converter_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  dom4j
-Requires:  maven
-Requires:  plexus-container-default
-Requires:  plexus-utils
-
-%description model-converter
-Converts between version 3.0.0 and version 4.0.0 models.
-
-%package reporting-impl
-Summary:        Maven Reporting Implementation
-Group:          Development/Java
-Version:        %{reporting_impl_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  jakarta-commons-validator
-Requires:  jakarta-oro
-Requires:  maven
-Requires:  maven-doxia
-
-%description reporting-impl
-%{summary}.
-
-%package repository-builder
-Summary:        Maven Repository Builder
-Group:          Development/Java
-Version:        %{repository_builder_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  %{name}-common-artifact-filters = 0:%{common_artifact_filters_version}-%{release}
-Requires:  maven
-
-%description repository-builder
-%{summary}.
-
-%package io
-Summary:        Maven Shared I/O API
-Group:          Development/Java
-Version:        %{io_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  maven
-Requires:  maven-wagon
-Requires:  plexus-utils
-Requires:  plexus-container-default
-
-%description io
-%{summary}.
-
-%package jar
-Summary:        Maven Shared Jar
-Group:          Development/Java
-Version:        %{jar_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  maven
-
-%description jar
-Utilities that help identify the contents of a JAR,
-including Java class analysis and Maven metadata
-analysis.
-
-%package monitor
-Summary:        Maven Shared Monitor API
-Group:          Development/Java
-Version:        %{monitor_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  maven
-Requires:  plexus-container-default
-
-%description monitor
-%{summary}.
-
-%package verifier
-Summary:        Maven Verifier Component
-Group:          Development/Java
-Version:        %{verifier_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  junit
-
-%description verifier
-%{summary}.
-
-%package javadoc
-Summary:        Javadoc for %{name}
-Group:          Development/Java 
-Provides:       %{name}-file-management-javadoc = %{file_management_version}-%{release}
-Obsoletes:      %{name}-file-management-javadoc < %{file_management_version}-%{release}
-Provides:       %{name}-plugin-testing-harness-javadoc = %{plugin_testing_harness_version}-%{release}
-Obsoletes:      %{name}-plugin-testing-harness-javadoc < %{plugin_testing_harness_version}-%{release}
-
-%description javadoc
-%{summary}.
-
-%package artifact-resolver
-Summary:        Maven Artifact Resolution API
-Group:          Development/Java
-Version:        %{artifact_resolver_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  ant
-Requires:  maven
-
-%description artifact-resolver
-Provides a component for plugins to easily resolve project dependencies.
-
-%package filtering
-Summary:        Maven Filtering
-Group:          Development/Java
-Version:        %{filtering_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  ant
-Requires:  maven
-
-%description filtering
-A component to assist in filtering of resource files with properties from a Maven project.
-
-%package reporting-api
-Summary:        Maven Reporting API
-Group:          Development/Java
-Version:        %{reporting_api_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  ant
-Requires:  maven
-
-%description reporting-api
-Maven Reporting API.
-
-%package runtime
-Summary:        Maven Runtime
-Group:          Development/Java
-Version:        %{runtime_version}
-Requires:  %{name} = 0:%{shared_components_version}-%{release}
-Requires:  ant
-Requires:  maven
-
-%description runtime
-Maven Runtime allows introspection of Maven project metadata at runtime.  Basic artifact information or full Maven
-project metadata can be obtained for all projects within a given class loader, optionally sorted into dependency
-order, and also for a given class within a project.
-
 %prep
-%setup -q -n %{name}-components-%{shared_components_version}
+%setup -q -n %{name}-%{name}-components-%{version}
 chmod -R go=u-w *
-%patch0 -p0 -b .sav0
-%patch1 -p0 -b .sav1
-%patch2 -p0 -b .sav2
-%patch3 -p0 -b .sav3
-%patch4 -p0 -b .sav4
-%patch5 -p0 -b .sav5
-%patch6 -p0 -b .sav6
-%patch7 -p0 -b .sav7
 
-# need namespace for new version modello
-sed -i "s|<model>|<model xmlns=\"http://modello.codehaus.org/MODELLO/1.3.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://modello.codehaus.org/MODELLO/1.3.0 http://modello.codehaus.org/xsd/modello-1.3.0.xsd\" xml.namespace=\"..\" xml.schemaLocation=\"..\" xsd.namespace=\"..\" xsd.targetNamespace=\"..\">|" file-management/src/main/mdo/fileset.mdo
-sed -i "s|<groupId>ant|<groupId>org.apache.ant|g" maven-ant/pom.xml
-
-# Remove test that needs junit-addons until that makes it into Fedora
-rm -f maven-reporting-impl/src/test/java/org/apache/maven/reporting/AbstractMavenReportRendererTest.java
-
-# Remove tests that need jmock (for now)
-rm -f maven-dependency-analyzer/src/test/java/org/apache/maven/shared/dependency/analyzer/InputStreamConstraint.java
-rm -f maven-dependency-analyzer/src/test/java/org/apache/maven/shared/dependency/analyzer/ClassFileVisitorUtilsTest.java
-rm -f maven-dependency-analyzer/src/test/java/org/apache/maven/shared/dependency/analyzer/AbstractFileTest.java
+# Maven-scm-publish-plugin is not in Fedora
+%pom_remove_plugin org.apache.maven.plugins:maven-scm-publish-plugin
 
 %build
-mvn-rpmbuild \
-        -Dmaven.local.depmap.file=%{SOURCE1} \
-        -Dmaven.test.skip=true \
-        -Dmaven.test.failure.ignore=true \
-        install javadoc:aggregate
+%mvn_build
 
 %install
+%mvn_install
 
-rm -rf $RPM_BUILD_ROOT
-# main package infrastructure
-install -d -m 755 $RPM_BUILD_ROOT%{_javadir}/maven-shared
-install -d -m 755 $RPM_BUILD_ROOT/%{_mavenpomdir}
+%files -f .mfiles
+%doc LICENSE.txt NOTICE.txt
 
-# poms and jars
-install -pm 644 pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-components-parent.pom
-%add_to_maven_depmap org.apache.maven.shared maven-shared-components %{shared_components_version} JPP/maven-shared components-parent
+%changelog
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 19-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
-install -pm 644 maven-downloader/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-downloader.pom
-%add_to_maven_depmap org.apache.maven.shared maven-downloader %{downloader_version} JPP/maven-shared downloader
-install -p -m 0644 maven-downloader/target/maven-downloader-%{downloader_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/downloader.jar
+* Tue Feb 26 2013 Tomas Radej <tradej@redhat.com> - 19-3
+- Fixed obsoletions
 
-install -pm 644 maven-dependency-analyzer/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-dependency-analyzer.pom
-%add_to_maven_depmap org.apache.maven.shared maven-dependency-analyzer %{dependency_analyzer_version} JPP/maven-shared dependency-analyzer
-install -p -m 0644 maven-dependency-analyzer/target/maven-dependency-analyzer-%{dependency_analyzer_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/dependency-analyzer.jar
+* Wed Feb 20 2013 Tomas Radej <tradej@redhat.com> - 19-2
+- Removed maven-scm-publish-plugin
 
-install -pm 644 maven-dependency-tree/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-dependency-tree.pom
-%add_to_maven_depmap org.apache.maven.shared maven-dependency-tree %{dependency_tree_version} JPP/maven-shared dependency-tree
-install -p -m 0644 maven-dependency-tree/target/maven-dependency-tree-%{dependency_tree_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/dependency-tree.jar
+* Tue Feb 19 2013 Tomas Radej <tradej@redhat.com> - 19-1
+- Updated to latest upstream version
+- Build with xmvn
 
-install -pm 644 maven-verifier/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-verifier.pom
-%add_to_maven_depmap org.apache.maven.shared maven-verifier %{verifier_version} JPP/maven-shared verifier
-install -p -m 0644 maven-verifier/target/maven-verifier-%{verifier_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/verifier.jar
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 15-31
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
-install -pm 644 maven-shared-monitor/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-monitor.pom
-%add_to_maven_depmap org.apache.maven.shared maven-shared-monitor %{monitor_version} JPP/maven-shared monitor
-install -p -m 0644 maven-shared-monitor/target/maven-shared-monitor-%{monitor_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/monitor.jar
+* Wed Feb 06 2013 Java SIG <java-devel@lists.fedoraproject.org> - 15-30
+- Update for https://fedoraproject.org/wiki/Fedora_19_Maven_Rebuild
+- Replace maven BuildRequires with maven-local
 
-install -pm 644 maven-shared-io/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-io.pom
-%add_to_maven_depmap org.apache.maven.shared maven-shared-io %{io_version} JPP/maven-shared io
-install -p -m 0644 maven-shared-io/target/maven-shared-io-%{io_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/io.jar
+* Thu Dec 20 2012 Michal Srb <msrb@redhat.com> - 15-29
+- Migrated from maven-doxia to doxia subpackages (Resolves: #889148)
 
-install -pm 644 maven-shared-jar/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-jar.pom
-%add_to_maven_depmap org.apache.maven.shared maven-shared-jar %{jar_version} JPP/maven-shared jar
-install -p -m 0644 maven-shared-jar/target/maven-shared-jar-%{jar_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/jar.jar
+* Wed Dec 19 2012 Tomas Radej <tradej@redhat.com> - 15-28
+- Obsoleted retired packages
+- Sorted (B)Rs, added R on jpackage-utils
 
-install -pm 644 maven-repository-builder/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-repository-builder.pom
-%add_to_maven_depmap org.apache.maven.shared maven-repository-builder %{repository_builder_version} JPP/maven-shared repository-builder
-install -p -m 0644 maven-repository-builder/target/maven-repository-builder-%{repository_builder_version}-alpha-3-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/repository-builder.jar
+* Fri Nov 30 2012 Tomas Radej <tradej@redhat.com> - 15-27
+- Removed ant, artifact-resolver, common-artifact-filters, dependency-tree, model-converter, runtime
+- Replaced patches with pom macros
 
-install -pm 644 maven-reporting-impl/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-reporting-impl.pom
-%add_to_maven_depmap org.apache.maven.reporting maven-reporting-impl %{reporting_impl_version} JPP/maven-shared reporting-impl
-install -p -m 0644 maven-reporting-impl/target/maven-reporting-impl-%{reporting_impl_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/reporting-impl.jar
+* Thu Nov 22 2012 Jaromir Capik <jcapik@redhat.com> - 15-26
+- Migration to plexus-containers-container-default
 
-install -pm 644 maven-model-converter/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-model-converter.pom
-%add_to_maven_depmap org.apache.maven.shared maven-model-converter %{model_converter_version} JPP/maven-shared model-converter
-install -p -m 0644 maven-model-converter/target/maven-model-converter-%{model_converter_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/model-converter.jar
+* Mon Nov 19 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 15-25
+- Fix verifier License tag
+- Install licelse files
 
-install -pm 644 maven-invoker/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-invoker.pom
-%add_to_maven_depmap org.apache.maven.shared maven-invoker %{invoker_version} JPP/maven-shared invoker
-install -p -m 0644 maven-invoker/target/maven-invoker-%{invoker_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/invoker.jar
+* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 15-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
-install -pm 644 maven-common-artifact-filters/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-common-artifact-filters.pom
-%add_to_maven_depmap org.apache.maven.shared maven-common-artifact-filters %{common_artifact_filters_version} JPP/maven-shared common-artifact-filters
-install -p -m 0644 maven-common-artifact-filters/target/maven-common-artifact-filters-%{common_artifact_filters_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/common-artifact-filters.jar
+* Wed Feb 29 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> 15-23
+- Remove exact version dependency on artifact-filters
+- Fix missing plexus-container-default in pom for shared-jar
 
-install -pm 644 maven-ant/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-ant.pom
-%add_to_maven_depmap org.apache.maven.shared maven-ant %{ant_version} JPP/maven-shared ant
-install -p -m 0644 maven-ant/target/maven-ant-%{ant_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/ant.jar
+* Sat Jan 14 2012 Ville Skyttä <ville.skytta@iki.fi> - 15-22
+- Require apache-commons-validator instead of jakarta-* in reporting-impl.
 
-install -pm 644 maven-osgi/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-osgi.pom
-%add_to_maven_depmap org.apache.maven.shared maven-osgi %{osgi_version} JPP/maven-shared osgi
-install -p -m 0644 maven-osgi/target/maven-osgi-%{osgi_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/osgi.jar
+* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 15-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
-install -pm 644 file-management/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-file-management.pom
-%add_to_maven_depmap org.apache.maven.shared file-management %{file_management_version} JPP/maven-shared file-management
-install -p -m 0644 file-management/target/file-management-%{file_management_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/file-management.jar
+* Sun Nov 27 2011 Ville Skyttä <ville.skytta@iki.fi> - 15-20
+- Fix plugin-testing-harness dependency/obsoletes/provides versions.
 
-install -pm 644 maven-artifact-resolver/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-artifact-resolver.pom
-%add_to_maven_depmap org.apache.maven.shared maven-artifact-resolver %{artifact_resolver_version} JPP/maven-shared artifact-resolver
-install -p -m 0644 maven-artifact-resolver/target/maven-artifact-resolver-%{artifact_resolver_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/artifact-resolver.jar
+* Wed Oct 12 2011 Jaromir Capik <jcapik@redhat.com> - 15-19
+- aqute-bndlib renamed to aqute-bnd (fixing name conflict)
 
-install -pm 644 maven-filtering/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-filtering.pom
-%add_to_maven_depmap org.apache.maven.shared maven-filtering %{filtering_version} JPP/maven-shared filtering
-install -p -m 0644 maven-filtering/target/maven-filtering-%{filtering_version}-beta-4-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/filtering.jar
+* Wed Aug 31 2011 Stanislav Ochotnicky <sochotnicky@redhat.com> - 15-18
+- Remove filtering subpackage (separate package now)
 
-install -pm 644 maven-reporting-api/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-reporting-api.pom
-%add_to_maven_depmap org.apache.maven.shared maven-reporting-api %{reporting_api_version} JPP/maven-shared reporting-api
-install -p -m 0644 maven-reporting-api/target/maven-reporting-api-%{reporting_api_version}-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/reporting-api.jar
+* Mon Aug 22 2011 Jaromir Capik <jcapik@redhat.com> - 15-17
+- Migration from plexus-maven-plugin to plexus-containers-component-metadata
+- Minor spec file changes according to the latest guidelines
 
-install -pm 644 maven-runtime/pom.xml $RPM_BUILD_ROOT/%{_mavenpomdir}/JPP.maven-shared-runtime.pom
-%add_to_maven_depmap org.apache.maven.shared maven-runtime %{runtime_version} JPP/maven-shared runtime
-install -p -m 0644 maven-runtime/target/maven-runtime-%{runtime_version}-alpha-3-SNAPSHOT.jar \
-        $RPM_BUILD_ROOT%{_javadir}/maven-shared/runtime.jar
+* Thu Jun 23 2011 Stanislav Ochotnicky <sochotnicky@redhat.com> - 15-16
+- Add second groupId for reporting-api to add compatibility
+- Versionless javadocs and remove defattr macros (not needed anymore)
+- Use new maven2 compatibility packages
+- Remove old patches
 
-# javadoc
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{shared_components_version}
-cp -pr target/site/apidocs/* \
-         $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{shared_components_version}/
+* Fri Jun 3 2011 Alexander Kurtakov <akurtako@redhat.com> 15-15
+- Require maven not maven2 now.
+- Adapt to current guidelines.
 
-ln -s %{name}-%{shared_components_version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 15-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
-%clean
-rm -rf $RPM_BUILD_ROOT
+* Fri Dec 17 2010 Alexander Kurtakov <akurtako@redhat.com> 15-13
+- Drop versioned jars.
+- Drop tomcat5 deps.
 
-%post
-%update_maven_depmap
+* Thu Sep 16 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 15-12
+- Use %%global instead of %%define
+- Use %%{_mavenpomdir}
+- Remove plexus-registry from BR/R
 
-%postun
-%update_maven_depmap
+* Tue Jun 01 2010 Yong Yang <yyang@redhat.com> 15-11
+- Rebuld with maven221
+- Add patches
+- Use javadoc:aggregate
 
-%files
-%defattr(-,root,root,-)
-%dir %{_javadir}/maven-shared
-%dir %{_mavenpomdir}
-%{_mavenpomdir}/JPP.maven-shared-components-parent.pom
-%{_mavendepmapfragdir}
+* Tue Jun 01 2010 Yong Yang <yyang@redhat.com> 15-10
+- Fix installed jar name of artifact-resolver, filtering, reporting-api, runtime
 
-%files file-management
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/file-management*.jar
-%{_mavenpomdir}/JPP.maven-shared-file-management.pom
+* Mon May 31 2010 Alexander Kurtakov <akurtako@redhat.com> 15-9
+- Reenable reporting api.
+- Fix groups.
+- Do not remove tests that run now.
 
-%files osgi
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/osgi*.jar
-%{_mavenpomdir}/JPP.maven-shared-osgi.pom
+* Mon May 31 2010 Alexander Kurtakov <akurtako@redhat.com> 15-8
+- Fix maven-archiver depmap.
 
-%files ant
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/ant*.jar
-%{_mavenpomdir}/JPP.maven-shared-ant.pom
+* Mon May 31 2010 Alexander Kurtakov <akurtako@redhat.com> 15-7
+- Release should be bigger than version 8 release.
 
-%files common-artifact-filters
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/common-artifact-filters*.jar
-%{_mavenpomdir}/JPP.maven-shared-common-artifact-filters.pom
+* Thu May 21 2010 Yong Yang <yyang@redhat.com> 15-1
+- Upgrade to 15
 
-%files dependency-analyzer
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/dependency-analyzer*.jar
-%{_mavenpomdir}/JPP.maven-shared-dependency-analyzer.pom
+* Thu May 20 2010 Yong Yang <yyang@redhat.com> 8-6
+- Properly comment %%add_maven_depmap
 
-%files dependency-tree
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/dependency-tree*.jar
-%{_mavenpomdir}/JPP.maven-shared-dependency-tree.pom
+* Thu May 20 2010 Yong Yang <yyang@redhat.com> 8-5
+- Remove plugin-tools* and pluging-testing*
+- Add BRs:  objectweb-asm, plexus-digest
 
-%files downloader
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/downloader*.jar
-%{_mavenpomdir}/JPP.maven-shared-downloader.pom
+* Thu Nov 26 2009 Lubomir Rintel <lkundrak@v3.sk> 8-4
+- Fix build
 
-%files invoker
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/invoker*.jar
-%{_mavenpomdir}/JPP.maven-shared-invoker.pom
+* Tue Sep 01 2009 Andrew Overholt <overholt@redhat.com> 8-3
+- Add tomcat5, easymock, and maven2-plugin-source BRs
 
-%files model-converter
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/model-converter*.jar
-%{_mavenpomdir}/JPP.maven-shared-model-converter.pom
+* Tue Sep 01 2009 Andrew Overholt <overholt@redhat.com> 8-2
+- Add tomcat5-servlet-2.4-api BR
 
+* Mon Aug 31 2009 Andrew Overholt <overholt@redhat.com> 8-1
+- Update to version 8 (courtesy Deepak Bhole)
 
-%files reporting-impl
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/reporting-impl*.jar
-%{_mavenpomdir}/JPP.maven-shared-reporting-impl.pom
+* Wed Jul  9 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 1.0-4.6
+- drop repotag
 
-%files repository-builder
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/repository-builder*.jar
-%{_mavenpomdir}/JPP.maven-shared-repository-builder.pom
+* Thu May 29 2008 Tom "spot" Callaway <tcallawa@redhat.com> 1.0-4jpp.5
+- fix license tag
 
-%files io
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/io*.jar
-%{_mavenpomdir}/JPP.maven-shared-io.pom
+* Thu Feb 28 2008 Deepak Bhole <dbhole@redhat.com> 1.0-4jpp.4
+- Rebuild
 
-%files jar
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/jar*.jar
-%{_mavenpomdir}/JPP.maven-shared-jar.pom
+* Fri Sep 21 2007 Deepak Bhole <dbhole@redhat.com> 0:1.0-4jpp.3
+- Rebuild with ppc64 excludearch'd
+- Removed 'jpp' from a BR version
 
-%files monitor
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/monitor*.jar
-%{_mavenpomdir}/JPP.maven-shared-monitor.pom
+* Tue Mar 20 2007 Deepak Bhole <dbhole@redhat.com> 0:1.0-4jpp.2
+- Fixed BRs and Reqa
 
-%files verifier
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/verifier*.jar
-%{_mavenpomdir}/JPP.maven-shared-verifier.pom
+* Tue Feb 27 2007 Tania Bento <tbento@redhat.com> 0:1.0-4jpp.1
+- Fixed %%Release.
+- Fixed %%BuildRoot.
+- Removed %%Vendor.
+- Removed %%Distribution.
+- Removed %%post and %%postun sections for file-management-javadoc.
+- Removed %%post and %%postun sections for plugin-testing-harness-javadoc.
+- Defined _with_gcj_support and gcj_support.
+- Fixed %%License.
+- Fixed %%Group.
+- Marked config file with %%config(noreplace) in %%files section.
+- Fixed instructions on how to generate source drop.
 
-%files artifact-resolver
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/artifact-resolver*.jar
-%{_mavenpomdir}/JPP.maven-shared-artifact-resolver.pom
+* Fri Oct 27 2006 Deepak Bhole <dbhole@redhat.com> 1.0-4jpp
+- Update for maven 9jpp
 
-%files filtering
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/filtering*.jar
-%{_mavenpomdir}/JPP.maven-shared-filtering.pom
+* Fri Sep 15 2006 Deepak Bhole <dbhole@redhat.com> 1.0-3jpp
+- Removed the file-management-pom.patch (no longer required)
+- Install poms
 
-%files reporting-api
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/reporting-api*.jar
-%{_mavenpomdir}/JPP.maven-shared-reporting-api.pom
+* Wed Sep 13 2006 Ralph Apel <r.apel@r-apel.de> 0:1.0-2jpp
+- Add plugin-testing-harness subpackage
 
-%files runtime
-%defattr(-,root,root,-)
-%{_javadir}/maven-shared/runtime*.jar
-%{_mavenpomdir}/JPP.maven-shared-runtime.pom
-
-%files javadoc
-%defattr(-,root,root,-)
-%{_javadocdir}/%{name}-%{shared_components_version}
-%doc %{_javadocdir}/%{name}
-
+* Mon Sep 11 2006 Ralph Apel <r.apel@r-apel.de> 0:1.0-1jpp
+- First release
+- Add gcj_support option
+- Add post/postun Requires for javadoc
