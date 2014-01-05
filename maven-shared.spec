@@ -33,7 +33,7 @@ Summary:        Maven Shared Components
 URL:            http://maven.apache.org/shared/
 Name:           maven-shared
 Version:        19
-Release:        4.0%{?dist}
+Release:        4.1%{?dist}
 License:        ASL 2.0
 
 
