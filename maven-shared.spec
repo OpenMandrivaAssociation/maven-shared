@@ -1,6 +1,6 @@
 %{?_javapackages_macros:%_javapackages_macros}
 Summary:        Maven Shared Components
-URL:            http://maven.apache.org/shared/
+URL:            https://maven.apache.org/shared/
 Name:           maven-shared
 Version:        21
 Release:        1.4
