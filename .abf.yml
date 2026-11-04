@@ -2,3 +2,5 @@ removed_sources:
   maven-shared-components-19.tar.gz: 77c856e388c355778cc3bdaff831cfcb2259ec62
 sources:
   maven-shared-components-21.tar.gz: 71b3fc66311d3edab156c4f797d28e0ecc886472
+  maven-shared-components-50.pom: a2378ca76231989eacfde89297f2602576500f34
+  LICENSE-2.0.txt: 2b8b815229aa8a61e483fb4ba0588b8b6c491890
