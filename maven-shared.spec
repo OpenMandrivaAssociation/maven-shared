@@ -10,6 +10,9 @@ Source0:        https://repo1.maven.org/maven2/org/apache/maven/shared/maven-sha
 Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt
 
 BuildArch:      noarch
+# Literal, so the first rpmbuild -bs records them before sysjar is installed.
+BuildRequires:	maven
+BuildRequires:	java-current-devel
 BuildSystem:	maven
 BuildOption:	validate
 
