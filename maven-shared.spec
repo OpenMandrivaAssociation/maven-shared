@@ -13,6 +13,7 @@ BuildArch:      noarch
 # Literal, so the first rpmbuild -bs records them before sysjar is installed.
 BuildRequires:	maven
 BuildRequires:	java-current-devel
+BuildRequires:	maven-parent
 BuildSystem:	maven
 BuildOption:	validate
 
